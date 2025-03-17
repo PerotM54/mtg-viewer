@@ -25,10 +25,9 @@ class ImportCardCommand extends Command
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly LoggerInterface        $logger,
-        private array                           $csvHeader = []
-    )
-    {
+        private readonly LoggerInterface $logger,
+        private array $csvHeader = []
+    ) {
         parent::__construct();
     }
 
@@ -46,6 +45,7 @@ class ImportCardCommand extends Command
         $this->logger->info('Importing cards from ' . $filepath);
         if ($handle === false) {
             $io->error('File not found');
+            $this->logger->error('File not found');
             return Command::FAILURE;
         }
 
@@ -79,6 +79,7 @@ class ImportCardCommand extends Command
         $end = microtime(true);
         $timeElapsed = $end - $start;
         $io->success(sprintf('Imported %d cards in %.2f seconds', $i, $timeElapsed));
+        $this->logger->info('Cards imported successfully in %.2f seconds', $timeElapsed);
         return Command::SUCCESS;
     }
 
@@ -106,6 +107,5 @@ class ImportCardCommand extends Command
         $card->setText($row['text']);
         $card->setType($row['type']);
         $this->entityManager->persist($card);
-
     }
 }
